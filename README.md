@@ -1,1 +1,1 @@
-# Data pipeline for an hypotetical E-comerce store
+# Data pipeline for an hypothetical E-comerce store
