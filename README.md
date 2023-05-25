@@ -1,1 +1,1 @@
-# data_ppeline_e-commerce
+# Data pipeline for an hypotetical E-comerce store
