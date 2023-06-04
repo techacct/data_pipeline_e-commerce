@@ -1,17 +1,8 @@
 import random
 from faker import Faker
-import psycopg2
+import csv
 
 fake = Faker()
-
-# Establish a connection to the PostgreSQL database
-conn = psycopg2.connect(
-    host="localhost",
-    database="your_database_name",
-    user="your_username",
-    password="your_password"
-)
-cur = conn.cursor()
 
 # Generate Sales Data
 def generate_sales_data(num_records):
@@ -61,38 +52,33 @@ def generate_delivery_data(num_records, order_ids):
         delivery_data.append([order_id, delivery_partner, delivery_date, delivery_status])
     return delivery_data
 
-# Generate and load data into the database
-def generate_and_load_data():
-    num_records = 1000
+# Generate and save data to CSV files
+def generate_and_save_data():
+    num_records = 100000
 
-    # Generate data
     sales_data = generate_sales_data(num_records)
+    with open('sales_data.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['OrderID', 'ProductID', 'UserID', 'Quantity', 'OrderDate', 'UnitPrice'])
+        writer.writerows(sales_data)
+
     product_data = generate_product_data(num_records)
+    with open('product_data.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['ProductID', 'ProductName', 'Category', 'ListPrice'])
+        writer.writerows(product_data)
+
     user_data = generate_user_data(num_records)
+    with open('user_data.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['UserID', 'UserName', 'Email', 'SignupDate', 'LastLogin'])
+        writer.writerows(user_data)
 
-    # Load User Data
-    cur.execute("CREATE TABLE IF NOT EXISTS user_data (UserID INT PRIMARY KEY, UserName VARCHAR, Email VARCHAR, SignupDate DATE, LastLogin DATE);")
-    cur.executemany("INSERT INTO user_data VALUES (%s, %s, %s, %s, %s);", user_data)
-
-    # Load Product Data
-    cur.execute("CREATE TABLE IF NOT EXISTS product_data (ProductID INT PRIMARY KEY, ProductName VARCHAR, Category VARCHAR, ListPrice INT);")
-    cur.executemany("INSERT INTO product_data VALUES (%s, %s, %s, %s);", product_data)
-
-    # Load Sales Data
-    cur.execute("CREATE TABLE IF NOT EXISTS sales_data (OrderID INT PRIMARY KEY, ProductID INT, UserID INT, Quantity INT, OrderDate DATE, UnitPrice INT, FOREIGN KEY (ProductID) REFERENCES product_data(ProductID), FOREIGN KEY (UserID) REFERENCES user_data(UserID));")
-    cur.executemany("INSERT INTO sales_data VALUES (%s, %s, %s, %s, %s, %s);", sales_data)
-
-    # Get the order IDs for generating delivery data
     order_ids = [record[0] for record in sales_data]
-
-    # Generate and Load Delivery Data
     delivery_data = generate_delivery_data(num_records, order_ids)
-    cur.execute("CREATE TABLE IF NOT EXISTS delivery_data (OrderID INT, DeliveryPartner VARCHAR, DeliveryDate DATE, DeliveryStatus VARCHAR, FOREIGN KEY (OrderID) REFERENCES sales_data(OrderID));")
-    cur.executemany("INSERT INTO delivery_data VALUES (%s, %s, %s, %s);", delivery_data)
+    with open('delivery_data.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['OrderID', 'DeliveryPartner', 'DeliveryDate', 'DeliveryStatus'])
+        writer.writerows(delivery_data)
 
-    # Commit the changes and close the database connection
-    conn.commit()
-    cur.close()
-    conn.close()
-
-generate_and_load_data()
+generate_and_save_data()

@@ -1,38 +1,11 @@
-import csv
-import sqlite3
+import subprocess
+from generate_data import generate_and_save_data
+from load_data import load_data
 
-# Step 1: Extract data from CSV files
-sales_data_file = 'sales_data.csv'
-product_data_file = 'product_data.csv'
-user_data_file = 'user_data.csv'
-delivery_data_file = 'delivery_data.csv'
+# Define the command to execute the script
+command = ['python', r'C:\\Users\\ademo\data_ppeline_e-commerce\\read_csv.py']
 
-sales_data = []
-product_data = []
-user_data = []
-delivery_data = []
-
-# Read Sales Data
-with open(sales_data_file, 'r') as file:
-    reader = csv.DictReader(file)
-    for row in reader:
-        sales_data.append(row)
-
-# Read Product Data
-with open(product_data_file, 'r') as file:
-    reader = csv.DictReader(file)
-    for row in reader:
-        product_data.append(row)
-
-# Read User Data
-with open(user_data_file, 'r') as file:
-    reader = csv.DictReader(file)
-    for row in reader:
-        user_data.append(row)
-
-# Read Delivery Data
-with open(delivery_data_file, 'r') as file:
-    reader = csv.DictReader(file)
-    for row in reader:
-        delivery_data.append(row)
-        
+# Run the script
+generate_and_save_data()
+subprocess.call(command)
+load_data()
